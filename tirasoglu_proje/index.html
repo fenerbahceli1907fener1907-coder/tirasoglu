@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Digital SAT Prep AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#07080f;--s1:#0f1018;--s2:#161721;--s3:#1e1f2e;
+  --bdr:#252638;--bdr2:#32344a;
+  --gold:#d4a847;--gold2:#a07830;
+  --blue:#5b8dee;--blue2:#3a6adc;
+  --teal:#3ecfbe;--teal2:#28a090;
+  --red:#ff5f6d;--grn:#39d98a;--warn:#ffc542;
+  --txt:#ddddf0;--muted:#7070a0;--muted2:#4a4a70;
+  --r:14px;--r2:10px;--r3:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* Background orbs */
+body::before{content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 900px 500px at -10% -5%, rgba(91,141,238,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 600px 400px at 110% 90%, rgba(212,168,71,.05) 0%,transparent 55%),
+    radial-gradient(ellipse 400px 300px at 50% 50%, rgba(62,207,190,.03) 0%,transparent 50%);
+  pointer-events:none;z-index:0}
+
+/* ── Header ── */
+header{
+  position:relative;z-index:10;
+  display:flex;align-items:center;gap:14px;
+  padding:28px 36px 0;
+}
+.logo{
+  width:46px;height:46px;border-radius:13px;
+  background:linear-gradient(135deg,var(--gold),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Playfair Display',serif;font-weight:900;font-size:22px;color:#fff;
+  box-shadow:0 4px 24px rgba(212,168,71,.3);
+}
+.head-text h1{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;letter-spacing:.3px}
+.head-text h1 em{font-style:normal;color:var(--gold)}
+.head-text p{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+
+/* ── Nav ── */
+nav{
+  position:relative;z-index:10;
+  display:flex;gap:6px;flex-wrap:wrap;
+  padding:22px 36px 0;
+}
+.nb{
+  padding:9px 17px;border:1px solid var(--bdr);background:var(--s1);
+  color:var(--muted);border-radius:var(--r2);cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
+  transition:all .18s;display:flex;align-items:center;gap:7px;white-space:nowrap;
+}
+.nb:hover{border-color:var(--gold);color:var(--gold)}
+.nb.on{background:linear-gradient(135deg,rgba(212,168,71,.12),rgba(91,141,238,.08));border-color:var(--gold);color:var(--gold)}
+.nb .ic{font-size:15px}
+
+/* ── Main ── */
+main{position:relative;z-index:10;max-width:880px;margin:28px auto;padding:0 20px 80px}
+
+/* Panels */
+.pnl{display:none;animation:fu .28s ease}
+.pnl.on{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.pnl-h{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:4px}
+.pnl-d{color:var(--muted);font-size:14px;margin-bottom:22px}
+
+/* Cards */
+.card{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r);padding:22px;margin-bottom:18px}
+
+/* Inputs */
+textarea,input[type=text]{
+  width:100%;background:var(--s1);border:1px solid var(--bdr);color:var(--txt);
+  border-radius:var(--r2);padding:13px 16px;
+  font-family:'Outfit',sans-serif;font-size:15px;resize:vertical;outline:none;
+  transition:border-color .18s;
+}
+textarea:focus,input[type=text]:focus{border-color:var(--gold)}
+textarea{min-height:90px}
+
+/* Buttons */
+.btn{
+  padding:11px 24px;border:none;border-radius:var(--r2);cursor:pointer;
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:13.5px;
+  transition:all .18s;display:inline-flex;align-items:center;gap:7px;
+}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn:active{transform:scale(.97)}
+.bg{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0a0f}
+.bg:hover:not(:disabled){opacity:.88;transform:translateY(-1px);box-shadow:0 4px 20px rgba(212,168,71,.3)}
+.bb{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff}
+.bb:hover:not(:disabled){opacity:.88;transform:translateY(-1px);box-shadow:0 4px 20px rgba(91,141,238,.3)}
+.bt{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#07080f}
+.bt:hover:not(:disabled){opacity:.88;transform:translateY(-1px);box-shadow:0 4px 20px rgba(62,207,190,.3)}
+.bsec{background:var(--s1);color:var(--txt);border:1px solid var(--bdr)}
+.bsec:hover:not(:disabled){border-color:var(--bdr2);background:var(--s3)}
+
+/* Result / Passage boxes */
+.rbox{
+  background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r2);
+  padding:18px;margin-top:14px;font-size:14.5px;line-height:1.75;
+  display:none;
+}
+.rbox.on{display:block;animation:fu .22s ease}
+
+/* Choice grid */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+@media(max-width:600px){.choices{grid-template-columns:1fr}}
+.choice-btn{
+  background:var(--s1);border:1.5px solid var(--bdr);border-radius:var(--r2);
+  padding:12px 16px;cursor:pointer;text-align:left;
+  font-family:'Outfit',sans-serif;font-size:14px;color:var(--txt);
+  transition:all .18s;display:flex;align-items:flex-start;gap:10px;
+}
+.choice-btn:hover:not(:disabled){border-color:var(--gold);background:rgba(212,168,71,.06)}
+.choice-btn .ltr{
+  font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px;
+  color:var(--gold);min-width:20px;
+}
+.choice-btn.selected{border-color:var(--blue);background:rgba(91,141,238,.08)}
+.choice-btn.correct{border-color:var(--grn)!important;background:rgba(57,217,138,.08)!important}
+.choice-btn.wrong{border-color:var(--red)!important;background:rgba(255,95,109,.08)!important}
+.choice-btn:disabled{cursor:default}
+
+/* Submit choice btn */
+.submit-row{margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* Score bar */
+.sbar-wrap{margin-top:14px}
+.sbar-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+.sbar{height:7px;background:var(--bdr);border-radius:99px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:99px;transition:width 1.1s cubic-bezier(.4,0,.2,1);
+  background:linear-gradient(90deg,var(--blue),var(--gold));width:0}
+
+/* Tags */
+.tag{display:inline-block;padding:3px 11px;border-radius:99px;font-size:11px;
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin:2px}
+.tg{background:rgba(57,217,138,.12);color:var(--grn);border:1px solid rgba(57,217,138,.25)}
+.tb{background:rgba(91,141,238,.12);color:var(--blue);border:1px solid rgba(91,141,238,.25)}
+.ty{background:rgba(212,168,71,.12);color:var(--gold);border:1px solid rgba(212,168,71,.25)}
+.tr{background:rgba(255,95,109,.12);color:var(--red);border:1px solid rgba(255,95,109,.25)}
+
+/* Loader */
+.ld{display:none;width:18px;height:18px;border:2px solid var(--bdr2);
+  border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+.ld.on{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Divider */
+.div{height:1px;background:var(--bdr);margin:18px 0}
+
+/* Label */
+.lbl{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+
+/* Passage scroll */
+.passage-box{
+  background:var(--s1);border:1px solid var(--bdr);border-left:3px solid var(--gold);
+  border-radius:var(--r2);padding:18px;max-height:240px;overflow-y:auto;
+  font-size:14.5px;line-height:1.85;margin-bottom:14px;display:none;
+}
+.passage-box.on{display:block;animation:fu .25s ease}
+
+/* Pair buttons */
+.bpair{display:flex;gap:10px;margin-top:6px}
+.bpair .btn{flex:1;justify-content:center}
+
+/* Answer reveal toggle */
+.anstog{
+  background:none;border:1px dashed var(--bdr2);color:var(--muted);
+  border-radius:var(--r3);padding:7px 16px;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:13px;transition:all .18s;
+}
+.anstog:hover{border-color:var(--teal);color:var(--teal)}
+
+/* Explanation box */
+.expbox{
+  margin-top:12px;background:rgba(62,207,190,.05);
+  border:1px solid rgba(62,207,190,.2);border-radius:var(--r2);
+  padding:16px;font-size:14px;line-height:1.75;display:none;
+}
+.expbox.on{display:block;animation:fu .2s ease}
+
+/* Badge */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;padding:4px 12px;
+  border-radius:99px;font-size:12px;font-weight:600;
+}
+.badge-gold{background:rgba(212,168,71,.15);color:var(--gold)}
+.badge-blue{background:rgba(91,141,238,.15);color:var(--blue)}
+.badge-red{background:rgba(255,95,109,.15);color:var(--red)}
+
+/* Grammar error display */
+.err-row{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;
+  background:rgba(255,95,109,.05);border:1px solid rgba(255,95,109,.15);
+  border-radius:var(--r3);margin-bottom:8px;font-size:14px}
+.err-num{font-family:'JetBrains Mono',monospace;color:var(--red);font-weight:600;font-size:13px;min-width:22px}
+.err-fix{color:var(--grn);font-weight:600}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+
+@media(max-width:640px){
+  header{padding:18px 14px 0}
+  nav{padding:18px 14px 0;gap:4px}
+  .nb{padding:7px 12px;font-size:12px}
+  main{padding:0 10px 60px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">S</div>
+  <div class="head-text">
+    <h1>Digital <em>SAT</em> Prep AI</h1>
+    <p>Python · Flask · Claude · College Board Style</p>
+  </div>
+</header>
+
+<nav>
+  <button class="nb on" onclick="tab('grammar')" id="nt-grammar"><span class="ic">✍️</span>Grammar Fix</button>
+  <button class="nb" onclick="tab('vocab')" id="nt-vocab"><span class="ic">📖</span>Vocabulary</button>
+  <button class="nb" onclick="tab('pronounce')" id="nt-pronounce"><span class="ic">🔊</span>Pronounce</button>
+  <button class="nb" onclick="tab('article')" id="nt-article"><span class="ic">📰</span>Article Quiz</button>
+  <button class="nb" onclick="tab('questions')" id="nt-questions"><span class="ic">🧮</span>SAT Questions</button>
+  <button class="nb" onclick="tab('gramex')" id="nt-gramex"><span class="ic">📝</span>Grammar Exercises</button>
+</nav>
+
+<main>
+
+<!-- ① Grammar Fix -->
+<div class="pnl on" id="pnl-grammar">
+  <div class="pnl-h">Grammar Correction</div>
+  <p class="pnl-d">İngilizce cümleni yaz — tüm grammatik hataları bulup düzelteceğim.</p>
+  <div class="card">
+    <div class="lbl">Your sentence</div>
+    <textarea id="gin" placeholder="e.g. She dont know nothing about the answer he give her yesterday..."></textarea>
+    <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+      <button class="btn bg" onclick="fixGrammar()">✦ Correct It</button>
+      <div class="ld" id="gld"></div>
+    </div>
+    <div class="rbox" id="gres"></div>
+  </div>
+</div>
+
+<!-- ② Vocabulary -->
+<div class="pnl" id="pnl-vocab">
+  <div class="pnl-h">Word Explorer</div>
+  <p class="pnl-d">Herhangi bir İngilizce kelime gir — anlamını, eş anlamlılarını ve SAT notunu göster.</p>
+  <div class="card">
+    <div class="lbl">Word</div>
+    <input type="text" id="vin" placeholder="e.g. ephemeral, meticulous, corroborate..." onkeydown="if(event.key==='Enter')lookupWord()"/>
+    <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+      <button class="btn bg" onclick="lookupWord()">✦ Look Up</button>
+      <div class="ld" id="vld"></div>
+    </div>
+    <div class="rbox" id="vres"></div>
+  </div>
+</div>
+
+<!-- ③ Pronounce -->
+<div class="pnl" id="pnl-pronounce">
+  <div class="pnl-h">Pronunciation</div>
+  <p class="pnl-d">Kelime veya cümle yaz — hem sesli okuyacağım hem fonetik yazacağım.</p>
+  <div class="card">
+    <div class="lbl">Word or sentence</div>
+    <textarea id="pin" placeholder="e.g. consequently, meticulous, The results were unprecedented..."></textarea>
+    <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+      <button class="btn bg" onclick="pronounceIt()">🔊 Pronounce</button>
+      <div class="ld" id="pld"></div>
+    </div>
+    <div class="rbox" id="pres"></div>
+  </div>
+</div>
+
+<!-- ④ Article Quiz -->
+<div class="pnl" id="pnl-article">
+  <div class="pnl-h">SAT Reading Article + Quiz</div>
+  <p class="pnl-d">Digital SAT stilinde makale gelir — ana fikir ve özet yaz, skorunu göster.</p>
+  <div class="card">
+    <button class="btn bg" onclick="getArticle()" id="artbtn">✦ New Article</button>
+    <div class="ld" id="artld" style="margin-top:12px"></div>
+    <div class="passage-box" id="arttext"></div>
+    <div id="artquiz" style="display:none">
+      <div class="lbl">What is the main idea of this passage?</div>
+      <textarea id="umain" placeholder="Write the main idea in 1-2 sentences..."></textarea>
+      <div style="margin-top:12px">
+        <div class="lbl">Write a brief summary</div>
+        <textarea id="usum" placeholder="Summarize the passage in 3-5 sentences..."></textarea>
+      </div>
+      <div class="submit-row" style="margin-top:14px">
+        <button class="btn bg" onclick="checkArticle()">✦ Check My Answers</button>
+        <div class="ld" id="chkld"></div>
+      </div>
+      <div class="rbox" id="chkres"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ SAT Questions -->
+<div class="pnl" id="pnl-questions">
+  <div class="pnl-h">Digital SAT Practice Questions</div>
+  <p class="pnl-d">Her basışta farklı gerçek SAT-seviyesinde soru gelir — şık seç, cevabı gör.</p>
+  <div class="card">
+    <div class="bpair">
+      <button class="btn bt" onclick="getQ('wr')">✦ Writing &amp; Reading</button>
+      <button class="btn bb" onclick="getQ('math')">∑ Math</button>
+    </div>
+    <div style="margin-top:12px;display:flex;justify-content:center"><div class="ld" id="qld"></div></div>
+    <div class="rbox" id="qcard">
+      <div id="qpassage"></div>
+      <div id="qtext" style="font-weight:600;font-size:15px;margin:10px 0"></div>
+      <div class="choices" id="qchoices"></div>
+      <div class="submit-row" id="qsubrow" style="display:none">
+        <button class="btn bg" onclick="submitQ()" id="qsubbtn">✦ Submit Answer</button>
+      </div>
+      <div class="expbox" id="qexp"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑥ Grammar Exercises -->
+<div class="pnl" id="pnl-gramex">
+  <div class="pnl-h">English Grammar Exercises</div>
+  <p class="pnl-d">Her butona basınca farklı konu — soru bitmez. Şıkkı seç, kuralı öğren.</p>
+  <div class="card">
+    <button class="btn bg" onclick="getGramEx()" id="gexbtn">✦ New Exercise</button>
+    <div style="margin-top:12px;display:flex;justify-content:center"><div class="ld" id="gexld"></div></div>
+    <div class="rbox" id="gexcard">
+      <div id="gextopic" style="margin-bottom:10px"></div>
+      <div id="gexinstr" style="color:var(--muted);font-size:13.5px;margin-bottom:6px"></div>
+      <div id="gexsentence" style="font-size:16px;font-weight:600;margin-bottom:14px;line-height:1.6"></div>
+      <div class="choices" id="gexchoices"></div>
+      <div class="submit-row" id="gexsubrow" style="display:none">
+        <button class="btn bg" onclick="submitGex()" id="gexsubbtn">✦ Submit</button>
+      </div>
+      <div class="expbox" id="gexexp"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+const API = '';  // same origin — Flask serves both
+
+// ── Tab switch ──────────────────────────────────────────────────────────────
+function tab(name){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pnl-'+name).classList.add('on');
+  document.getElementById('nt-'+name).classList.add('on');
+}
+
+function ld(id,on){const e=document.getElementById(id);e&&(on?e.classList.add('on'):e.classList.remove('on'))}
+function show(id,html,isText){
+  const e=document.getElementById(id);
+  e.classList.add('on');
+  isText?e.textContent=html:e.innerHTML=html;
+}
+
+async function api(path,method='GET',body=null){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(API+path,opts);
+  return r.json();
+}
+
+// ── ① Grammar ───────────────────────────────────────────────────────────────
+async function fixGrammar(){
+  const text=document.getElementById('gin').value.trim();
+  if(!text)return;
+  ld('gld',true);
+  document.getElementById('gres').classList.remove('on');
+
+  const d=await api('/api/grammar','POST',{text});
+  ld('gld',false);
+
+  if(d.error){show('gres',`<span style="color:var(--red)">${d.error}</span>`);return}
+
+  let html='';
+  if(d.error_count===0){
+    html=`<div style="color:var(--grn);font-weight:600">✅ No grammar errors found! Your sentence is correct.</div>`;
+  } else {
+    html+=`<div style="margin-bottom:12px"><span class="badge badge-red">❌ ${d.error_count} error${d.error_count>1?'s':''} found</span></div>`;
+    d.errors.forEach((e,i)=>{
+      html+=`<div class="err-row">
+        <div class="err-num">${i+1}</div>
+        <div>
+          <span style="color:var(--red);text-decoration:line-through">"${e.original}"</span>
+          → <span class="err-fix">"${e.fixed}"</span>
+          <span class="tag ty">${e.rule}</span><br>
+          <span style="color:var(--muted);font-size:13px">${e.explanation}</span>
+        </div>
+      </div>`;
+    });
+    html+=`<div class="div"></div>
+      <div class="lbl">Corrected sentence</div>
+      <div style="background:rgba(57,217,138,.06);border:1px solid rgba(57,217,138,.2);border-radius:var(--r3);padding:14px;font-size:15px;line-height:1.7;font-weight:500">
+        ✅ ${d.corrected_sentence}
+      </div>`;
+  }
+  show('gres',html);
+}
+
+// ── ② Vocab ─────────────────────────────────────────────────────────────────
+async function lookupWord(){
+  const word=document.getElementById('vin').value.trim();
+  if(!word)return;
+  ld('vld',true);
+  document.getElementById('vres').classList.remove('on');
+
+  const d=await api('/api/vocab','POST',{word});
+  ld('vld',false);
+
+  if(d.error){show('vres',`<span style="color:var(--red)">${d.error}</span>`);return}
+
+  const defs=(d.definitions||[]).map((x,i)=>
+    `<div style="margin-bottom:10px">
+      <span style="color:var(--gold);font-weight:600">${i+1}.</span> ${x.meaning}<br>
+      <span style="color:var(--muted);font-style:italic;font-size:13.5px">"${x.example}"</span>
+    </div>`).join('');
+
+  const syns=(d.synonyms||[]).map(s=>`<span class="tag tb">${s}</span>`).join('');
+  const ants=(d.antonyms||[]).map(a=>`<span class="tag tr">${a}</span>`).join('');
+
+  const html=`
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+      <span style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--gold)">${d.word||word}</span>
+      <span style="font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:14px">${d.phonetic||''}</span>
+      <span class="tag ty">${d.part_of_speech||''}</span>
+    </div>
+    ${defs}
+    <div class="div"></div>
+    <div class="lbl">Synonyms</div><div style="margin-bottom:12px">${syns}</div>
+    ${ants?`<div class="lbl">Antonyms</div><div style="margin-bottom:12px">${ants}</div>`:''}
+    ${d.sat_note?`<div style="background:rgba(212,168,71,.08);border:1px solid rgba(212,168,71,.2);border-radius:var(--r3);padding:12px;font-size:13.5px;margin-bottom:10px">
+      📌 <strong>SAT Note:</strong> ${d.sat_note}</div>`:''}
+    ${d.memory_tip?`<div style="background:rgba(91,141,238,.08);border:1px solid rgba(91,141,238,.2);border-radius:var(--r3);padding:12px;font-size:13.5px">
+      💡 <strong>Memory Tip:</strong> ${d.memory_tip}</div>`:''}`;
+  show('vres',html);
+}
+
+// ── ③ Pronounce ─────────────────────────────────────────────────────────────
+async function pronounceIt(){
+  const text=document.getElementById('pin').value.trim();
+  if(!text)return;
+  ld('pld',true);
+  document.getElementById('pres').classList.remove('on');
+
+  const d=await api('/api/pronounce','POST',{text});
+  ld('pld',false);
+
+  const html=`
+    <div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:var(--gold);margin-bottom:10px">${d.ipa||''}</div>
+    <div style="font-size:15px;margin-bottom:6px">Syllables: <strong>${d.syllables||''}</strong></div>
+    <div style="font-size:15px;margin-bottom:6px">Say it: <strong style="color:var(--teal)">${d.simple_guide||''}</strong></div>
+    ${d.stress?`<div style="color:var(--muted);font-size:13.5px;margin-bottom:10px">🎵 ${d.stress}</div>`:''}
+    ${(d.tips||[]).map(t=>`<div style="color:var(--blue);font-size:13.5px;margin-bottom:4px">→ ${t}</div>`).join('')}
+    ${d.common_mistake?`<div class="div"></div><div style="background:rgba(255,95,109,.06);border:1px solid rgba(255,95,109,.2);border-radius:var(--r3);padding:12px;font-size:13.5px">
+      ⚠️ <strong>Common mistake:</strong> ${d.common_mistake}</div>`:''}
+    <div class="div"></div>
+    <button class="btn bsec" onclick="speak('${text.replace(/'/g,"\\'")}')">🔊 Listen Again</button>`;
+  show('pres',html);
+  speak(text);
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-US';u.rate=0.82;
+  window.speechSynthesis.speak(u);
+}
+
+// ── ④ Article Quiz ───────────────────────────────────────────────────────────
+let artData={};
+async function getArticle(){
+  ld('artld',true);
+  document.getElementById('arttext').classList.remove('on');
+  document.getElementById('artquiz').style.display='none';
+  document.getElementById('chkres').classList.remove('on');
+
+  artData=await api('/api/article');
+  ld('artld',false);
+
+  document.getElementById('arttext').textContent=artData.passage||'';
+  document.getElementById('arttext').classList.add('on');
+  document.getElementById('artquiz').style.display='block';
+  document.getElementById('umain').value='';
+  document.getElementById('usum').value='';
+}
+
+async function checkArticle(){
+  const umain=document.getElementById('umain').value.trim();
+  const usum=document.getElementById('usum').value.trim();
+  if(!umain||!usum){alert('Lütfen her iki alanı da doldur!');return}
+  ld('chkld',true);
+  document.getElementById('chkres').classList.remove('on');
+
+  const d=await api('/api/check_answers','POST',{
+    passage:artData.passage,
+    true_main_idea:artData.true_main_idea,
+    key_points:artData.key_points,
+    user_main_idea:umain, user_summary:usum
+  });
+  ld('chkld',false);
+
+  const g=d.grade||'';
+  const sc=d.overall_score||0;
+  const col=sc>=80?'var(--grn)':sc>=60?'var(--warn)':'var(--red)';
+  const missed=(d.missed_points||[]).map(p=>`<li style="margin-bottom:4px">${p}</li>`).join('');
+
+  const html=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap">
+      <span style="font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:${col}">${sc}%</span>
+      <span style="font-size:28px;color:${col};font-weight:700">${g}</span>
+    </div>
+    <div style="margin-bottom:10px">
+      <strong>Main Idea</strong> <span style="color:var(--muted);font-size:13px">(${d.main_idea_score||0}%)</span><br>
+      <span style="font-size:14px">${d.main_idea_feedback||''}</span>
+    </div>
+    <div style="margin-bottom:10px">
+      <strong>Summary</strong> <span style="color:var(--muted);font-size:13px">(${d.summary_score||0}%)</span><br>
+      <span style="font-size:14px">${d.summary_feedback||''}</span>
+    </div>
+    ${missed?`<div style="margin-bottom:10px"><strong>Missed points:</strong><ul style="margin-top:6px;padding-left:18px;font-size:13.5px;color:var(--muted)">${missed}</ul></div>`:''}
+    ${d.encouragement?`<div style="color:var(--teal);font-size:13.5px">💪 ${d.encouragement}</div>`:''}
+    <div class="sbar-wrap">
+      <div class="sbar-labels"><span>Accuracy</span><span>${sc}%</span></div>
+      <div class="sbar"><div class="sbar-fill" id="abfill"></div></div>
+    </div>`;
+  show('chkres',html);
+  setTimeout(()=>{const f=document.getElementById('abfill');if(f)f.style.width=sc+'%'},80);
+}
+
+// ── ⑤ SAT Questions ──────────────────────────────────────────────────────────
+let qData={};let qSelected=null;
+
+async function getQ(type){
+  ld('qld',true);
+  const qcard=document.getElementById('qcard');
+  qcard.classList.remove('on');
+  document.getElementById('qexp').classList.remove('on');
+  qSelected=null;
+
+  const endpoint=type==='math'?'/api/math_question':'/api/wr_question';
+  qData=await api(endpoint);
+  ld('qld',false);
+
+  // Build passage
+  const passEl=document.getElementById('qpassage');
+  if(qData.passage){
+    passEl.innerHTML=`<div style="background:rgba(212,168,71,.05);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 var(--r3) var(--r3) 0;font-size:14px;line-height:1.8;margin-bottom:12px;color:var(--txt)">${qData.passage}</div>`;
+  } else passEl.innerHTML='';
+
+  // Header badges
+  const diff=qData.difficulty||'';
+  const topic=qData.topic||qData.subtype||qData.skill||'';
+  const diffCol=diff==='Hard'?'var(--red)':diff==='Medium'?'var(--warn)':'var(--grn)';
+
+  document.getElementById('qtext').innerHTML=
+    `<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <span class="badge" style="background:rgba(91,141,238,.12);color:var(--blue)">${type==='math'?'📐 Math':'📖 W&R'}</span>
+      ${diff?`<span class="badge" style="background:rgba(255,95,109,.1);color:${diffCol}">${diff}</span>`:''}
+      ${topic?`<span class="badge badge-gold">${topic}</span>`:''}
+    </div>
+    <div style="font-size:15px;font-weight:600;line-height:1.6;margin-top:4px">${qData.question||''}</div>`;
+
+  // Choices
+  const choicesEl=document.getElementById('qchoices');
+  choicesEl.innerHTML='';
+  const ch=qData.choices;
+  if(ch){
+    ['A','B','C','D'].forEach(l=>{
+      if(!ch[l])return;
+      const btn=document.createElement('button');
+      btn.className='choice-btn';
+      btn.id='qc-'+l;
+      btn.innerHTML=`<span class="ltr">${l}</span><span>${ch[l]}</span>`;
+      btn.onclick=()=>selectQ(l);
+      choicesEl.appendChild(btn);
+    });
+    document.getElementById('qsubrow').style.display='flex';
+  } else {
+    // grid-in
+    choicesEl.innerHTML=`<div style="padding:10px 0;color:var(--muted);font-size:13.5px">Grid-in question — solve and check the answer below.</div>`;
+    document.getElementById('qsubrow').style.display='none';
+    setTimeout(()=>revealQExp(),0);
+  }
+
+  qcard.classList.add('on');
+}
+
+function selectQ(l){
+  document.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('qc-'+l)?.classList.add('selected');
+  qSelected=l;
+}
+
+function submitQ(){
+  if(!qSelected)return;
+  const correct=qData.correct_answer;
+  ['A','B','C','D'].forEach(l=>{
+    const b=document.getElementById('qc-'+l);
+    if(!b)return;
+    b.disabled=true;
+    if(l===correct) b.classList.add('correct');
+    else if(l===qSelected) b.classList.add('wrong');
+  });
+  document.getElementById('qsubbtn').disabled=true;
+  revealQExp();
+}
+
+function revealQExp(){
+  const exp=document.getElementById('qexp');
+  let html='';
+  if(qData.correct_answer) html+=`<div style="color:var(--grn);font-weight:700;font-size:15px;margin-bottom:8px">✅ Correct Answer: ${qData.correct_answer}</div>`;
+  if(qData.solution||qData.explanation) html+=`<div style="margin-bottom:8px;font-size:14px;line-height:1.75">${qData.solution||qData.explanation||''}</div>`;
+  if(qData.concept) html+=`<div style="color:var(--blue);font-size:13px;margin-bottom:6px">🎯 Concept: ${qData.concept}</div>`;
+  if(qData.trap) html+=`<div style="color:var(--warn);font-size:13px">⚠️ Trap: ${qData.trap}</div>`;
+  if(qData.strategy) html+=`<div style="color:var(--teal);font-size:13px">💡 Strategy: ${qData.strategy}</div>`;
+  exp.innerHTML=html;
+  exp.classList.add('on');
+}
+
+// ── ⑥ Grammar Exercises ──────────────────────────────────────────────────────
+let gexData={};let gexSelected=null;
+
+async function getGramEx(){
+  ld('gexld',true);
+  document.getElementById('gexcard').classList.remove('on');
+  document.getElementById('gexexp').classList.remove('on');
+  gexSelected=null;
+
+  gexData=await api('/api/grammar_exercise');
+  ld('gexld',false);
+
+  document.getElementById('gextopic').innerHTML=`<span class="badge badge-gold">📝 ${gexData.topic||'Grammar'}</span>`;
+  document.getElementById('gexinstr').textContent=gexData.instruction||'Choose the correct answer.';
+  document.getElementById('gexsentence').textContent=gexData.sentence||'';
+
+  const choicesEl=document.getElementById('gexchoices');
+  choicesEl.innerHTML='';
+  const ch=gexData.choices||{};
+  ['A','B','C','D'].forEach(l=>{
+    if(!ch[l])return;
+    const btn=document.createElement('button');
+    btn.className='choice-btn';
+    btn.id='gc-'+l;
+    btn.innerHTML=`<span class="ltr">${l}</span><span>${ch[l]}</span>`;
+    btn.onclick=()=>selectGex(l);
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('gexsubrow').style.display='flex';
+  document.getElementById('gexsubbtn').disabled=false;
+  document.getElementById('gexcard').classList.add('on');
+}
+
+function selectGex(l){
+  document.querySelectorAll('#gexchoices .choice-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('gc-'+l)?.classList.add('selected');
+  gexSelected=l;
+}
+
+function submitGex(){
+  if(!gexSelected)return;
+  const correct=gexData.correct_answer;
+  ['A','B','C','D'].forEach(l=>{
+    const b=document.getElementById('gc-'+l);
+    if(!b)return;
+    b.disabled=true;
+    if(l===correct) b.classList.add('correct');
+    else if(l===gexSelected) b.classList.add('wrong');
+  });
+  document.getElementById('gexsubbtn').disabled=true;
+
+  const exp=document.getElementById('gexexp');
+  let html=`<div style="color:var(--grn);font-weight:700;font-size:15px;margin-bottom:8px">✅ Correct Answer: ${correct}</div>`;
+  if(gexData.rule) html+=`<div style="color:var(--gold);font-size:14px;font-weight:600;margin-bottom:6px">📌 Rule: ${gexData.rule}</div>`;
+  if(gexData.explanation) html+=`<div style="font-size:14px;line-height:1.75;margin-bottom:8px">${gexData.explanation}</div>`;
+  if((gexData.more_examples||[]).length){
+    html+=`<div style="color:var(--muted);font-size:13px;margin-bottom:4px">More examples:</div>`;
+    html+=(gexData.more_examples).map(e=>`<div style="color:var(--teal);font-size:13.5px;font-style:italic;margin-bottom:3px">"${e}"</div>`).join('');
+  }
+  if(gexData.tip) html+=`<div style="margin-top:8px;color:var(--blue);font-size:13px">💡 ${gexData.tip}</div>`;
+  exp.innerHTML=html;
+  exp.classList.add('on');
+}
+</script>
+</body>
+</html>

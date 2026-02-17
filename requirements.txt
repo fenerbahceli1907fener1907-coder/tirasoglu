@@ -1,0 +1,5 @@
+streamlit
+flask
+flask_cors
+anthropic
+python-dotenv
