@@ -363,7 +363,7 @@ def index():
     return send_from_directory(".", "index.html")
 
 
-if __name__ == "__main__":
-    print("\n🎓 Digital SAT Prep başlatılıyor...")
-    print("👉 http://localhost:5000 adresini aç\n")
-    app.run(debug=True, port=5000)
+# if __name__ == "__main__":
+#     print("\n Digital SAT Prep başlatılıyor...")
+#     print(" http://localhost:5000 adresini aç\n")
+#     app.run(debug=True, port=5000)
